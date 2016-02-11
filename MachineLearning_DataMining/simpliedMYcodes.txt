@@ -1,0 +1,278 @@
+**********Linear Regression**************
+
+#The basic syntax is 
+x<-c(1,2,3)
+y<-c(4,2,1)
+lm(y~x) #where y is the response, x is the predictor, and data is the data set in which these two variables are kept.
+
+'''Output
+Coefficients:
+(Intercept)            y  
+ 3.5000000   -0.6428571
+  '''
+#Here the solution is of the form y= mx+ c; Intercept i.e. c is 3.5000;;; AND slope i.e. m is -.06428571
+
+summary(lm(y~x)) #to get the squared errors
+
+#^^^^^^^IMPORTANT^^^^^^ R squared the higher the better
+
+plot(x,y) #shows a scatter plot of x and y
+fit<-lm(y~x)
+abline(fit,col="red") #Shows the line drawn by linear regression
+predict(fit) #Gives the y values predicted for the given values of x (1,2 and 3) by linear regression
+predict(fit,data.frame(x=c(4.5,5,6)) # x = 4.5, 5 and 6 i.e. for unknown values of x, the corresponding values of y will be predicted
+
+#ANOTHER EXAMPLE
+a<-read.csv("MyData.csv")
+lm(Beautifulness~Complexition,a) # here Beautifulness and Complextion are column names of the dataset Mydata.csv
+
+
+
+
+
+
+
+
+
+**************Multiple Linear Regression****************
+x<-c(1,2,3)
+y<-c(4,2,1)
+z<-c(3,4,5)
+fi<-lm(y~x+z)
+plot(fi) #see different plots of the fit fi
+#The syntax lm(y~x1+x2+x3)is used to fit a model with three predictors,x1, x2,and x3
+
+fit3=lm(medv~.,Boston) # means y i.e. response is the column medv of dataset Boston AND other sum values of other columns (except medv) of the dataset Boston are treated as x.
+
+
+lm(Beautifulness~Complextion+Smartness+Look+Attitude+Age+Knowledge,data=a)
+lm(Beautifulness~.,data=a)
+#Both of the above lines are same when a denotes dataset having columns Beautifulness,Complextion,Smartness,Look,Attitude,Age,Knowledge
+
+
+
+*****************Non Linear Regression********************************
+fi<-lm(y~x1*x2)
+
+fit5=lm(medv~lstat*age,Boston)
+summary(fit5)
+fit6=lm(medv~lstat +I(lstat^2),Boston); summary(fit6)
+#The lm()function can also accommodate non-linear transformations of the predictors. For instance, given a predictor X, we can create a predictor X2 using I(X^2). The function I()is needed since the ^has a special meaning I() in a formula; wrapping as we do allows the standard usage in R, which is to raiseXto the power 2. 
+
+attach(Boston)
+par(mfrow=c(1,1))
+plot(medv~lstat)
+points(lstat,fitted(fit6),col="red",pch=20) # To highlight the points fitted, here the points will not be on a line so abline won't give proper result thus use this
+points(x,fitted(name_of_the_fit_done_with_lm),col="colour_of_the_points",pch=integer_number)#integer_number=20 means circle, different values of pch corresponds to different cycles
+fit7=lm(medv~poly(lstat,4))
+points(lstat,fitted(fit7),col="blue",pch=20) 
+
+********others****
+fix(Carseats) #opens a data editor with boston dataset as data frame, here the values can be changed
+
+<<<<<IMPORTANT>>>>
+Suppose a file myfile.csv has only one column which has different type of values in different number like a,a,a,a,a,a,b,b,b,b,a,b,b,a,a,c,c,c,c,c,c,c,c,c,a,a  in seperate lines we want to count the number of time a, b , c has occured individually then we can simply load it in R and write summary(read.csv("myfile.csv"))
+
+a<-read.csv("Mydata.csv")
+pairs(a) #Plot between every pair of columns of a will be shown
+fit=lm(wage~poly(age,4),data=Wage)
+summary(fit)
+fita=lm(wage~age+I(age^2)+I(age^3)+I(age^4),data=Wage)
+summary(fita)
+fit=glm(I(wage>250) ~ poly(age,3), data=Wage, family=binomial)
+
+
+************TREE BASED METHODS******************
+```{r}
+require(ISLR)
+require(tree)
+attach(Carseats)
+hist(Sales)
+High=ifelse(Sales<=8,"No","Yes")
+Carseats=data.frame(Carseats, High)
+```
+Now we fit a tree to these data, and summarize and plot it. Notice that we have to _exclude_ `Sales` from the right-hand side of the formula, because the response is derived from it.
+```{r}
+tree.carseats=tree(High~.-Sales,data=Carseats)
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats,pretty=0)
+```
+
+This tree was grown to full depth, and might be too variable. We now use CV to prune it.
+```{r}
+cv.carseats=cv.tree(tree.carseats,FUN=prune.misclass)
+cv.carseats
+plot(cv.carseats)
+prune.carseats=prune.misclass(tree.carseats,best=13)
+plot(prune.carseats);text(prune.carseats,pretty=0)
+```
+Now lets evaluate this pruned tree on the test data.
+```{r}
+tree.pred=predict(prune.carseats,Carseats[-train,],type="class")
+with(Carseats[-train,],table(tree.pred,High))
+(72+32)/150
+```
+
+
+
+#RANDOM FOREST
+```{r}
+require(randomForest)
+require(MASS)
+set.seed(101)
+dim(Boston)
+train=sample(1:nrow(Boston),300)
+?Boston
+```
+Lets fit a random forest and see how well it performs. We will use the response `medv`, the median housing value (in \$1K dollars)
+
+```{r}
+rf.boston=randomForest(medv~.,data=Boston,subset=train)
+rf.boston
+```
+
+#Boosting
+--------
+Boosting builds lots of smaller trees. Unlike random forests, each new tree in boosting tries to patch up the deficiencies of the current ensemble.
+```{r}
+require(gbm)
+boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
+summary(boost.boston)
+plot(boost.boston,i="lstat")
+plot(boost.boston,i="rm")
+```
+
+
+**************************Logistic Regression************
+# Logistic regression
+
+glm.fit=glm(y~x1+x2+x3,data=name_of_dataFrame,family=binomial)
+glm.fit=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data=Smarket,family=binomial)
+summary(glm.fit)
+glm.probs=predict(glm.fit,type="response") #The type="response" option tells R to output probabilities of the form P(Y=1|X), as opposed to other information such as the logit.
+glm.probs[1:5]
+
+table(x,y) #shows a 2d matrix of x and y
+
+
+*****************Non Linear Models***********************************
+require(ISLR)
+attach(Wage)
+
+
+
+**********Making training set***********
+train = Year<2005
+glm.fit=glm(Direction~Lag1+Lag2, data=Smarket,family=binomial, subset=train)
+
+###SAMPLING
+Mydata<-read.csv("Rdata.csv")
+newdata<-Mydata[,2:3] # newdata having 2 columns 1st is the value of x-coordinate of the data followed by the y-coordinate of the data
+newdata[sample(nrow(newdata),3),] #3 random rows of newdata will be selected
+
+sample(x, size, replace = FALSE, prob = NULL)
+x:	Either a vector of one or more elements from which to choose, or a positive integer
+size:	a non-negative integer giving the number of items to choose.
+replace:	Should sampling be with replacement?
+prob:	A vector of probability weights for obtaining the elements of the vector being sampled.
+
+
+
+********KNN***************************
+knn(training_data_frame, test_data_frame, class_of_training_data_frame, k = value_of_k, l = 0)
+
+
+library(class)
+?knn
+attach(Smarket)
+Xlag=cbind(Lag1,Lag2)
+train=Year<2005
+knn.pred=knn(Xlag[train,],Xlag[!train,],Direction[train],k=1)
+
+
+***************Cross validation*************
+require(boot)
+cv.glm(data, glmfit, cost, K) #k fold cross vlidation
+#data	A matrix or data frame containing the data. The rows should be cases and the columns correspond to variables, one of which is the response.
+#glmfit	An object of class "glm" containing the results of a generalized linear model fitted to data.
+#cost	A function of two vector arguments specifying the cost function for the cross-validation. 
+
+
+
+**********Principal Component Analysis***************
+a<-read.csv("MyData.csv")
+b<-na.omit(a)
+pr.out=prcomp(b , scale=TRUE)
+pr.out
+
+
+
+*******************K-Means Clustering*****************
+set.seed(101)
+
+kmeans(x, centers, iter.max = 10, nstart = 1,algorithm = c("Hartigan-Wong", "Lloyd", "Forgy","MacQueen"), trace=FALSE) 
+#x numeric matrix of data, centers the number of clusters i.e. k, iter.max the maximum number of iterations allowed, nstart	is how many random sets should be chosen?, trace not use
+Mydata<-read.csv("Rdata.csv")
+newdata<-Mydata[,2:3] # newdata having 2 columns 1st is the value of x-coordinate of the data followed by the y-coordinate of the data
+print (newdata)
+kc <- kmeans(newdata, 3) #number of cluster =3
+summary(kc) 
+plot(newdata[c("Complextion", "Smartness")], col=kc$cluster) # col=kc$cluster ensures that every clusters are differently coloured
+points(kc$centers[,c("Complextion", "Smartness")], col=1:3, pch=8, cex=2) #pointing the centroids of the clusters obtained
+
+
+************Hierarchical Clustering*****************
+hc.complete=hclust(dist(newdata),method="complete") ## newdata having 2 columns 1st is the value of x-coordinate of the data followed by the y-coordinate of the data, dist function will find out the distance between the data points
+plot(hc.complete)
+hc.single=hclust(dist(x),method="single")
+plot(hc.single)
+hc.average=hclust(dist(x),method="average")
+plot(hc.average)
+
+#Measuring the efficiency of the cluster
+hc.cut=cutree(hc.complete,4) #4 clusters will bw taken. This will produce a vector of numbers from 1 to 4.
+
+table(hc.cut,km.out$cluster) #comparing hierarchical and kmeans clustering
+
+''' Complete:
+Maximal intercluster dissimilarity. Compute all pairwise dissimilarities
+between the observations in cluster A and the
+observations in cluster B, and record the largest of these
+dissimilarities.
+
+Single:
+Minimal intercluster dissimilarity. Compute all pairwise dissimilarities
+between the observations in cluster A and the
+observations in cluster B, and record the smallest of these
+dissimilarities. Single linkage can result in extended, trailing
+clusters in which single observations are fused one-at-a-time.
+
+Average:
+Mean intercluster dissimilarity. Compute all pairwise dissimilarities
+between the observations in cluster A and the
+observations in cluster B, and record the average of these
+dissimilarities.'''
+
+*************Support Vector Machine************
+library(e1071)
+svmfit=svm(Complextion~.,data=newdata[c("Complextion", "Smartness")],kernel="linear",cost=10,scale=FALSE)
+print(svmfit)
+plot(svmfit,newdata[c("Complextion", "Smartness")])
+predict(svmfit,value_to_be_predicted)
+
+
+ANN
+ann_model <- neuralnet( y ~ x1 + x2 + x3, data=as.data.frame(cbind(y,x1,x2, x3)), hidden = 1)
+p <- compute( ann_model, as.data.frame(cbind(x1,x2)) )
+
+Apriori
+apriori_model <- apriori(as.matrix(sampleDataset), parameter = list(supp = 0.8, conf = 0.9))
+
+
+AdaBoost
+boost_model <- ada(x=X, y=labels)
+predicted_values <- predict(some_model, newdata=as.data.frame(cbind(x1_test, x2_test)))
+
+NAIVE BAYES
+naiveBayes_model <- naiveBayes(y ~ x1 + x2, data=as.data.frame(cbind(y,x1,x2)))

@@ -1,0 +1,77 @@
+Download a webpage
+
+Now that we have data on NBA players from 2013-2014, let’s scrape some additional data to supplement it. We’ll just look at one box score from the NBA Finals here to save time.
+
+R
+
+library(RCurl)
+url <- "http://www.basketball-reference.com/boxscores/201506140GSW.html"
+data <- readLines(url)
+
+Python
+
+import requests
+url = "http://www.basketball-reference.com/boxscores/201506140GSW.html"
+data = requests.get(url).content
+
+In Python, the requests package makes downloading web pages easy, with a consistent API for all request types. In R, RCurl provides a similarly simple way to make requests. Both download the webpage to a character datatype. Note: this step is unnecessary for the next step in R, but is shown for comparisons’s sake.
+Extract player box scores
+
+Now that we have the web page, we’ll need to parse it to extract scores for players.
+
+R
+
+library(rvest)
+page <- read_html(url)
+table <- html_nodes(page, ".stats_table")[3]
+rows <- html_nodes(table, "tr")
+cells <- html_nodes(rows, "td a")
+teams <- html_text(cells)
+
+extractRow <-function(rows, i){
+if(i == 1){
+return
+}
+row <- rows[i]
+tag <- “td”
+if(i == 2){
+tag <- “th”
+}
+items <- html_nodes(row, tag)
+html_text(items)
+}
+
+scrapeData <-function(team){
+teamData <- html_nodes(page, paste(“#”,team,”_basic”, sep=”"))
+rows <- html_nodes(teamData, “tr”)
+lapply(seq_along(rows), extractRow, rows=rows)
+}
+
+data <- lapply(teams, scrapeData)
+
+Python
+
+from bs4 import BeautifulSoup
+import re
+soup = BeautifulSoup(data, 'html.parser')
+box_scores = []
+for tag in soup.find_all(id=re.compile("[A-Z]{3,}_basic")):
+rows = []
+for i, row in enumerate(tag.find_all("tr")):
+if i == 0:
+continue
+elif i == 1:
+tag = "th"
+else:
+tag = "td"
+row_data = [item.get_text() for item in row.find_all(tag)]
+rows.append(row_data)
+box_scores.append(rows)
+
+This will create a list containing two lists, the first with the box score for CLE, and the second with the box score for GSW. Both contain the headers, along with each player and their in-game stats. We won’t turn this into more training data now, but it could easily be transformed into a format that could be added to our nba dataframe.
+
+The R code is more complex than the Python code, because there isn’t a convenient way to use regular expressions to select items, so we have to do additional parsing to get the team names from the HTML. R also discourages using for loops in favor of applying functions along vectors. We use lapply to do this, but since we need to treat each row different depending on whether it’s a header or not, we pass the index of the item we want, and the entire rows list into the function.
+
+We use rvest, a new and widely used R web scraping package to extract the data we need. Note that we can pass a url directly into rvest, so the last step wasn’t needed in R.
+
+In Python, we use BeautifulSoup, the most commonly used web scraping package. It enables us to loop through the tags and construct a list of lists in a straightforward way.

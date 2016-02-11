@@ -1,0 +1,44 @@
+Linear Regression
+fit1=lm(medv~lstat,data=Boston)
+predict(fit1,data.frame(lstat=c(5,10,15)),interval="confidence")
+
+
+Logistic Regression
+glm.fit=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data=Smarket,family=binomial)
+
+
+K-NN
+Following is the sample command given X_train represents a training dataset, X_test represents test data set, k represents number of nearest neighbors to be included for the modeling
+knn_model <- knn(train=X_train, test=X_test, cl=as.factor(labels), k=K)
+
+K-Means
+Mydata<-read.csv("Rdata.csv")
+newdata<-mydata[,2:3]
+print (newdata)
+(kc <- kmeans(newdata, 3)) 
+summary(kc) 
+
+
+NAIVE BAYES
+naiveBayes_model <- naiveBayes(y ~ x1 + x2, data=as.data.frame(cbind(y,x1,x2)))
+
+DECISION TREES
+cart_model <- rpart(y ~ x1 + x2, data=as.data.frame(cbind(y,x1,x2)), method="class")
+
+
+SVM
+svm_model <- svm(x=X, y=as.factor(labels), kernel ="radial", cost=C)
+
+
+ANN
+ann_model <- neuralnet( y ~ x1 + x2 + x3, data=as.data.frame(cbind(y,x1,x2, x3)), hidden = 1)
+p <- compute( ann_model, as.data.frame(cbind(x1,x2)) )
+
+Apriori
+apriori_model <- apriori(as.matrix(sampleDataset), parameter = list(supp = 0.8, conf = 0.9))
+
+
+AdaBoost
+boost_model <- ada(x=X, y=labels)
+predicted_values <- predict(some_model, newdata=as.data.frame(cbind(x1_test, x2_test)))
+

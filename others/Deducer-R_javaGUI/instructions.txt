@@ -1,0 +1,4 @@
+install.packages(c("JGR","Deducer","DeducerExtras"))
+#Use R and Java of same version..if java is of 32 bit, use 32 bit R as in my case
+library(JGR)
+JGR()

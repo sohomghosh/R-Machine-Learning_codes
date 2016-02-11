@@ -1,0 +1,48 @@
+#counting number of number of distinct elements in a list
+> a<-c('a','b','b','g')
+> table(a)
+a
+a b g 
+1 2 1 
+> 
+
+
+
+concatinating 2 character vectors
+a<-c("1","2","3")
+b<-c("4","9","9")
+paste(a,b,sep="_")
+
+#Cross join of dataframes df1 and df2v
+merge(df1,df2,by=NULL)
+
+
+#Running RScripts from terminal
+WinKey + R
+write cmd and press enter
+in command prompt witre R enter, R terminal will appear
+> source("Location\File_name.R",echo=T)
+
+
+
+CATEGORICAL TO NUMERIC
+Method-1
+#A is read.csv(....filename.csv.....)
+b<-a[,11] #11th column of a to be made numerical from categorical
+cc<-as.numeric(b)
+
+Method-2
+#A is read.csv(....filename.csv.....)
+b<-a[,11] #11th column of a to be made numerical from categorical
+cc<-na.omit(b)
+dd<-unique(cc)
+ddd<-as.vector(dd)
+r<-c(1:length(ddd))
+names(r)<-ddd
+bb<-as.character(b)
+library(stringr)
+for (i in 1:length(r)){
+  bbb<-str_replace_all(bb,ddd[i],r[ddd[i]])
+  bb<-bbb
+  }
+#bbb is the final output

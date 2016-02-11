@@ -1,0 +1,25 @@
+install.packages("igraph")
+A <- matrix(c(0,1,0,0,0,0,
+                        1,0,1,0,0,0,
+                        0,1,0,1,1,1,
+                        0,0,1,0,1,0,
+                        0,0,1,1,0,1,
+                        0,0,1,0,1,0 ),6,6, byrow= TRUE)
+EV <- eigen(A) # compute eigenvalues and eigenvectors
+max(EV$values)  # find the maximum eigenvalue
+EV
+
+
+g <- graph.adjacency(A)
+closeness(g)
+betweenness(g)
+degree(g)
+
+layout1 <- layout.fruchterman.reingold(g)
+plot(g, layout=layout1)
+
+
+library(igraph)
+g <- make_empty_graph(n = 5) %>%
+  add_edges(c(1,2, 2,3, 3,4, 4,5))
+  plot(g)

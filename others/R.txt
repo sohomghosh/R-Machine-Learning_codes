@@ -1,0 +1,38 @@
+->bring laptop, charger tab, dongle *
+
+-> duster
+
+-> marker ink
+
+-> marker
+
+-> extension cord 
+
+-> cord USB/ data cable
+
+-> mouse take
+
+list, vector starts with 1
+do while not used, repeat is used.
+R supports both procedural programming like java, c++ and functional programming like C
+column no. , row no, starts from 1
+R font size increase
+Edit-> GUI preference -> size 10
+R is case sensitive
+
+->difference between script and file
+
+-> delete variable in R
+
+-> memory allocation, deallocation
+
+->Range of calculations that can be done by R
+
+-> lexical scoping
+
+-> equivalent to scanf in R
+
+-> lapply, sapply
+
+-> int, double space, memory reqd reqd in r
+-> coursera, udacity videos see
